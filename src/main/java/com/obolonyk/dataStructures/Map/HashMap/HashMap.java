@@ -135,7 +135,7 @@ public class HashMap<K, V> implements Map<K, V> {
                     }
                 }
             }
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("There is no next element in the map");
         }
 
         @Override

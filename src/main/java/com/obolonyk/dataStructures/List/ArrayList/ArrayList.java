@@ -110,7 +110,8 @@ public class ArrayList<T> implements List<T> {
 
     private void checkInBounds(int index, int endOfBound) {
         if (index < 0 || index > endOfBound) {
-            throw new IndexOutOfBoundsException("Element on the index " + index + " , is out of bounds: 0 - " + endOfBound);
+            throw new IndexOutOfBoundsException("Element on the index " + index +
+                    " , is out of bounds: 0 - " + endOfBound);
         }
     }
 
@@ -123,9 +124,8 @@ public class ArrayList<T> implements List<T> {
 
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(", ", "[", "]");
-        Iterator<T> iterator = iterator();
-        while (iterator.hasNext()) {
-            stringJoiner.add(iterator.next().toString());
+        for (T t : this) {
+            stringJoiner.add(t.toString());
         }
         return stringJoiner.toString();
     }
@@ -157,12 +157,11 @@ public class ArrayList<T> implements List<T> {
 
         @Override
         public void remove() {
-            if (currentPosition != -1) {
-                ArrayList.this.remove(currentPosition);
-                currentPosition = -1;
-            } else {
+            if (currentPosition == -1) {
                 throw new IllegalStateException("The removing element is not identified");
             }
+            ArrayList.this.remove(currentPosition);
+            currentPosition = -1;
         }
     }
 

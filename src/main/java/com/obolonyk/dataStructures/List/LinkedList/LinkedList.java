@@ -92,8 +92,7 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public void clear() {
-        head = null;
-        tail = null;
+        head = tail = null;
         size = 0;
     }
 
@@ -151,7 +150,7 @@ public class LinkedList<T> implements List<T> {
 
     private class MyIterator implements Iterator<T> {
         private Node<T> nextNode = head;
-        private Node<T> currentNode = null;
+        private Node<T> currentNode;
 
         @Override
         public boolean hasNext() {
@@ -198,13 +197,15 @@ public class LinkedList<T> implements List<T> {
 
     private void validateIndexForAddAndGet(int index) {
         if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Element on the index " + index + " , is out of bounds: 0 - " + size);
+            throw new IndexOutOfBoundsException("Element on the index " + index +
+                    " , is out of bounds: 0 - " + size);
         }
     }
 
     private void validateIndexForRemoveAndSet(int index) {
         if (index < 0 || index > size - 1) {
-            throw new IndexOutOfBoundsException("Element on the index " + index + " , is out of bounds: 0 - " + (size - 1));
+            throw new IndexOutOfBoundsException("Element on the index " + index +
+                    " , is out of bounds: 0 - " + (size - 1));
         }
     }
 
