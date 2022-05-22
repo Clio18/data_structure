@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-public class HashMap<K,V> implements Map<K,V> {
+public class HashMap<K, V> implements Map<K, V> {
     private static final double LOAD_FACTOR = 0.75;
     private static final int DEFAULT_GROW = 2;
     private static final int INITIAL_CAPACITY = 5;
@@ -215,11 +215,15 @@ public class HashMap<K,V> implements Map<K,V> {
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(", ", "[", "]");
-        Iterator<Map.Entry<K, V>> iterator = iterator();
-        while (iterator.hasNext()) {
-            stringJoiner.add(iterator.next().toString());
+        for (Map.Entry<K, V> kvEntry : this) {
+            stringJoiner.add(kvEntry.toString());
         }
         return stringJoiner.toString();
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        return get(key) != null;
     }
 
     int getBucketLength() {

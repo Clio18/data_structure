@@ -722,4 +722,126 @@ class HashMapTest {
         assertEquals(0, map.size());
     }
 
+    @Test
+    @DisplayName("Given Empty Map When Contains Null Key Then False Should Be Returned")
+    void givenEmptyMapWhenContainsNullKeyThenFalseShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+        assertFalse(map.containsKey(null));
+    }
+
+    @Test
+    @DisplayName("Given Empty Map When Contains Not Null Key Then False Should Be Returned")
+    void givenEmptyMapWhenContainsNotNullKeyThenFalseShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+        assertFalse(map.containsKey("key"));
+    }
+
+    @Test
+    @DisplayName("Given Map With Existing Null Key When Contains Null Key Then True Should Be Returned")
+    void givenMapWithExistingNullKeyWhenContainsNullKeyThenTrueShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+        map.put(null, "value");
+
+        assertTrue(map.containsKey(null));
+    }
+
+    @Test
+    @DisplayName("Given Map With Not Existing Null Key When Contains Null Key Then False Should Be Returned")
+    void givenMapWithNotExistingNullKeyWhenContainsNullKeyThenFalseShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+        map.put("key", "value");
+
+        assertFalse(map.containsKey(null));
+    }
+
+    @Test
+    @DisplayName("Given Not Existing Key When Contains Key Then False Should Be Returned")
+    void givenNotExistingKeyWhenContainsKeyThenFalseShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+        map.put("key", "value");
+
+        assertTrue(map.containsKey("key"));
+    }
+
+    @Test
+    @DisplayName("Given Existing Key When Contains Key Then True Should Be Returned")
+    void givenExistingKeyWhenContainsKeyThenTrueShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+        map.put("key", "value");
+
+        assertFalse(map.containsKey("not existing key"));
+    }
+
+    @Test
+    @DisplayName("Given Multiple Nodes In Same Bucket And Existing Key When Contains By Key Then True Should Be Returned")
+    void givenMultipleNodesInSameBucketAndExistingKeyWhenContainsByKeyThenTrueShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+
+        String firstKey = "key1";
+        String secondKey = "key2"; //same bucket
+        String thirdKey = "key-1"; //same bucket
+        String fourthKey = "key-10"; //same bucket
+
+        String firstValue = "value1";
+        String secondValue = "value2";
+        String thirdValue = "value3";
+        String fourthValue = "value4";
+
+        map.put(firstKey, firstValue);
+        map.put(secondKey, secondValue);
+        map.put(thirdKey, thirdValue);
+        map.put(fourthKey, fourthValue);
+
+        assertTrue(map.containsKey(firstKey));
+        assertTrue(map.containsKey(secondKey));
+        assertTrue(map.containsKey(thirdKey));
+        assertTrue(map.containsKey(fourthKey));
+    }
+
+    @Test
+    @DisplayName("Given Multiple Nodes In Same Bucket And Not Existing Key With Hash Leading To Same Bucket When Contains By Key Then False Should Be Returned")
+    void givenMultipleNodesInSameBucketAndNotExistingKeyWithHashLeadingToSameBucketWhenContainsByKeyThenFalseShouldBeReturned() {
+        Map<String, String> map = new HashMap<>();
+
+        String firstKey = "key1";
+        String secondKey = "key2"; //same bucket
+        String thirdKey = "key-1"; //same bucket
+        String fourthKey = "key-10"; //same bucket
+        String notExistingKeyWithHashLeadingToSameBucket = "key+12";
+
+        String firstValue = "value1";
+        String secondValue = "value2";
+        String thirdValue = "value3";
+        String fourthValue = "value4";
+
+        map.put(firstKey, firstValue);
+        map.put(secondKey, secondValue);
+        map.put(thirdKey, thirdValue);
+        map.put(fourthKey, fourthValue);
+
+        assertTrue(map.containsKey(firstKey));
+        assertTrue(map.containsKey(secondKey));
+        assertTrue(map.containsKey(thirdKey));
+        assertTrue(map.containsKey(fourthKey));
+
+        assertFalse(map.containsKey(notExistingKeyWithHashLeadingToSameBucket));
+    }
+
+    @Test
+    @DisplayName("Given Iterator When Remove Called After Next Then Size Should Be Decreased By One And Map Should Not Contain This Key")
+    void givenIteratorWhenRemoveCalledAfterNextThenSizeShouldBeDecreasedByOneAndMapShouldNotContainThisKey() {
+        HashMap<String, String> map = new HashMap<>();
+        String key = "key";
+        map.put(key, "value");
+        assertEquals(1, map.size());
+
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+        iterator.next();
+        iterator.remove();
+
+        assertEquals(0, map.size());
+        assertFalse(map.containsKey(key));
+    }
+
+
 }
