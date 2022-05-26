@@ -1,5 +1,6 @@
-package com.obolonyk.dataStructures.List;
+package com.obolonyk.datastructures.list;
 
+import com.obolonyk.datastructures.list.arraylist.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,8 +42,8 @@ public abstract class AbstractListTest {
     @Test
     @DisplayName("Test Add And Get And Check Size")
     void testAddAndGetAndCheckOrderByGetMethod() {
-        String firstValue = listWithElements.get(0).toString();
-        String secondValue = listWithElements.get(1).toString();
+        String firstValue = listWithElements.get(0);
+        String secondValue = listWithElements.get(1);
         assertEquals("A", firstValue);
         assertEquals("B", secondValue);
     }
@@ -52,7 +53,7 @@ public abstract class AbstractListTest {
     void testAddAndGetAndByZeroIndexAndCheckSizeAndOrder() {
         listWithElements.add("C", 0);
         assertEquals(4, listWithElements.size());
-        String firstValue = listWithElements.get(0).toString();
+        String firstValue = listWithElements.get(0);
         assertEquals("C", firstValue);
     }
 
@@ -62,8 +63,8 @@ public abstract class AbstractListTest {
         int size = listWithElements.size();
         listWithElements.add("X", size);
         assertEquals(4, listWithElements.size());
-        String addedValue = listWithElements.get(3).toString();
-        ;
+        String addedValue = listWithElements.get(3);
+
         assertEquals("X", addedValue);
     }
 
@@ -106,7 +107,7 @@ public abstract class AbstractListTest {
     @Test
     @DisplayName("Test Remove And Check Return Value")
     void testRemoveAndCheckReturnValue() {
-        String removedValue = listWithElements.remove(0).toString();
+        String removedValue = listWithElements.remove(0);
         assertEquals(2, listWithElements.size());
         assertEquals("A", removedValue);
     }
@@ -198,7 +199,7 @@ public abstract class AbstractListTest {
     void testGetNullAndCheckResult() {
         emptyList.add("A");
         emptyList.add(null);
-        assertEquals(null, emptyList.get(1));
+        assertNull(emptyList.get(1));
     }
 
     @Test
@@ -240,7 +241,7 @@ public abstract class AbstractListTest {
     @Test
     @DisplayName("Test Set And Check Returned Value")
     void testSetAndCheckReturnedValue() {
-        String returnedValue = listWithElements.set("X", 0).toString();
+        String returnedValue = listWithElements.set("X", 0);
         assertEquals("A", returnedValue);
     }
 
@@ -251,7 +252,7 @@ public abstract class AbstractListTest {
         assertEquals(3, listWithElements.size());
         assertTrue(listWithElements.contains("X"));
         assertFalse(listWithElements.contains("A"));
-        String value = listWithElements.get(0).toString();
+        String value = listWithElements.get(0);
         assertEquals("X", value);
     }
 
@@ -414,28 +415,17 @@ public abstract class AbstractListTest {
     @Test
     @DisplayName("Test Iterator Next And Check Returned Value")
     void testIteratorNextAndCheckReturnedValue() {
-        Iterator iterator = listWithElements.iterator();
+        Iterator<String> iterator = listWithElements.iterator();
         assertEquals("A", iterator.next());
         assertEquals("B", iterator.next());
         assertEquals("C", iterator.next());
     }
 
     @Test
-    @DisplayName("Test Iterator Remove And Check Throws Exception")
-    void testIteratorRemoveAndCheckThrowsException() {
-        Iterator iterator = listWithElements.iterator();
-        assertThrows(IllegalStateException.class, () -> {
-            while (iterator.hasNext()) {
-                iterator.remove();
-            }
-        });
-    }
-
-    @Test
     @DisplayName("Test Iterator Has Next On One Element And Check  Tue")
     void testIteratorHasNextOnOneElementAndCheckTue() {
         emptyList.add("A");
-        Iterator iterator = emptyList.iterator();
+        Iterator<String> iterator = emptyList.iterator();
         assertTrue(iterator.hasNext());
     }
 
@@ -462,7 +452,7 @@ public abstract class AbstractListTest {
         emptyList.add("A");
         emptyList.add("B");
         emptyList.add("C");
-        Iterator iterator = emptyList.iterator();
+        Iterator<String> iterator = emptyList.iterator();
         assertEquals("A", iterator.next());
         assertEquals("B", iterator.next());
         assertEquals("C", iterator.next());
@@ -474,12 +464,13 @@ public abstract class AbstractListTest {
         emptyList.add("A");
         emptyList.add("B");
         emptyList.add("C");
-        Iterator iterator = emptyList.iterator();
+        Iterator<String> iterator = emptyList.iterator();
         iterator.next();
         iterator.next();
         iterator.next();
         iterator.remove();
-        assertEquals("[A, B]", emptyList.toString());
+        assertEquals("A", emptyList.get(0));
+        assertEquals("B", emptyList.get(1));
     }
 
     @Test
@@ -488,10 +479,11 @@ public abstract class AbstractListTest {
         emptyList.add("A");
         emptyList.add("B");
         emptyList.add("C");
-        Iterator iterator = emptyList.iterator();
+        Iterator<String> iterator = emptyList.iterator();
         iterator.next();
         iterator.remove();
-        assertEquals("[B, C]", emptyList.toString());
+        assertEquals("B", emptyList.get(0));
+        assertEquals("C", emptyList.get(1));
         assertEquals(2, emptyList.size());
     }
 
@@ -501,10 +493,8 @@ public abstract class AbstractListTest {
         emptyList.add("A");
         emptyList.add("B");
         emptyList.add("C");
-        Iterator iterator = emptyList.iterator();
-        assertThrows(IllegalStateException.class, () -> {
-            iterator.remove();
-        });
+        Iterator<String> iterator = emptyList.iterator();
+        assertThrows(IllegalStateException.class, iterator::remove);
     }
 
     @Test
@@ -513,13 +503,95 @@ public abstract class AbstractListTest {
         emptyList.add("A");
         emptyList.add("B");
         emptyList.add("C");
-        Iterator iterator = emptyList.iterator();
-        try {
-            iterator.remove();
-        } catch (IllegalStateException e) {
-            assertEquals("The removing element is not identified",
-                    e.getMessage());
+        Iterator<String> iterator = emptyList.iterator();
+        IllegalStateException illegalStateException = assertThrows(IllegalStateException.class, iterator::remove);
+        assertEquals("Next method has not yet been called, or the remove method has already been called after the last call to the next method",
+                illegalStateException.getMessage());
+    }
+
+    @Test
+    @DisplayName("test LastIndexOf With The Same Elements")
+    void testLastIndexOfWithTheSameElements() {
+        emptyList.add("A");
+        emptyList.add("B");
+        emptyList.add("C");
+        emptyList.add("D");
+        emptyList.add("A");
+        emptyList.add("E");
+        int index = emptyList.lastIndexOf("A");
+        assertEquals(4, index);
+    }
+
+    @Test
+    @DisplayName("test LastIndexOf With The Same Elements Where The Element In The Beginning")
+    void testLastIndexOfWithTheSameElementsWhereTheElementInTheBeginning() {
+        emptyList.add("A");
+        emptyList.add("B");
+        emptyList.add("C");
+        emptyList.add("D");
+        emptyList.add("N");
+        emptyList.add("E");
+        int index = emptyList.lastIndexOf("A");
+        assertEquals(0, index);
+    }
+
+    @Test
+    @DisplayName("test LastIndexOf With The Same Elements Where The Element In The End")
+    void testLastIndexOfWithTheSameElementsWhereTheElementInTheEnd() {
+        emptyList.add("E");
+        emptyList.add("B");
+        emptyList.add("C");
+        emptyList.add("D");
+        emptyList.add("N");
+        emptyList.add("A");
+        int index = emptyList.lastIndexOf("A");
+        assertEquals(5, index);
+    }
+
+    @Test
+    @DisplayName("test LastIndexOf With The Same Elements Where The Element In The Middle")
+    void testLastIndexOfWithTheSameElementsWhereTheElementInTheMiddle() {
+        emptyList.add("E");
+        emptyList.add("B");
+        emptyList.add("C");
+        emptyList.add("A");
+        emptyList.add("N");
+        emptyList.add("C");
+        emptyList.add("F");
+        int index = emptyList.lastIndexOf("A");
+        assertEquals(3, index);
+    }
+
+    @Test
+    @DisplayName("test EnsureCapacity For Capacity One")
+    void testEnsureCapacityForCapacityOne() {
+        List<String> list = new ArrayList<>(1);
+        list.add("A");
+        list.add("A");
+
+        assertEquals(2, list.size());
+
+    }
+
+    @Test
+    @DisplayName("test EnsureCapacity For Zero Capacity")
+    void testEnsureCapacityForZeroCapacity() {
+        List<String> list = new ArrayList<>(0);
+        assertThrows(ArrayIndexOutOfBoundsException.class, ()-> list.add("A"));
+
+    }
+
+    @Test
+    @DisplayName("Test Remove By Removing By Zero Index")
+    void testRemoveByRemovingByZeroIndex(){
+        for (int i = 0; i < 5; i++) {
+            emptyList.add("A");
         }
+        for (int i = 0; i < 5; i++) {
+            emptyList.remove(0);
+        }
+        assertEquals(0, emptyList.size());
+        assertTrue(emptyList.isEmpty());
     }
 
 }

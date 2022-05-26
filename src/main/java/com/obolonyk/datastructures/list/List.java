@@ -1,4 +1,4 @@
-package com.obolonyk.dataStructures.List;
+package com.obolonyk.datastructures.list;
 
 public interface List<T> extends Iterable<T>{
     // add value to the end of the list

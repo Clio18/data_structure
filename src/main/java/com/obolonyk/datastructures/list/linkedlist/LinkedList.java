@@ -1,6 +1,6 @@
-package com.obolonyk.dataStructures.List.LinkedList;
+package com.obolonyk.datastructures.list.linkedlist;
 
-import com.obolonyk.dataStructures.List.List;
+import com.obolonyk.datastructures.list.List;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -19,22 +19,18 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public void add(T value, int index) {
-        validateIndexForAddAndGet(index);
+        validateIndexForAdd(index);
         Node<T> newNode = new Node<>(value);
         if (size == 0) {
             tail = head = newNode;
-            size++;
         } else if (index == size) {
-            newNode = new Node<>(value);
             tail.next = newNode;
             newNode.prev = tail;
             tail = newNode;
-            size++;
         } else if (index == 0) {
             newNode.next = head;
             head.prev = newNode;
             head = newNode;
-            size++;
         } else {
             Node<T> currentNode = getNode(index);
             Node<T> prevNode = currentNode.prev;
@@ -42,35 +38,16 @@ public class LinkedList<T> implements List<T> {
             newNode.prev = prevNode;
             newNode.next = currentNode;
             currentNode.prev = newNode;
-            size++;
         }
+        size++;
     }
 
     @Override
     public T remove(int index) {
-        validateIndexForRemoveAndSet(index);
-        Node<T> removedNode;
-        if (index == 0) {
-            Node<T> newHead = head.next;
-            removedNode = head;
-            head = newHead;
-            size--;
-        } else if (index == size - 1) {
-            Node<T> newTail = tail.prev;
-            removedNode = tail;
-            tail = newTail;
-            tail.next = null;
-            size--;
-        } else {
-            Node<T> currentNode = getNode(index);
-            Node<T> prevNode = currentNode.prev;
-            Node<T> nextNode = currentNode.next;
-            removedNode = currentNode;
-            prevNode.next = nextNode;
-            nextNode.prev = prevNode;
-            size--;
-        }
-        return removedNode.value;
+        validateIndex(index);
+        Node<T> currentNode = getNode(index);
+        removeNode(currentNode);
+        return currentNode.value;
     }
 
     @Override
@@ -83,7 +60,7 @@ public class LinkedList<T> implements List<T> {
         if (isEmpty()) {
             throw new IndexOutOfBoundsException("Set element in empty list");
         }
-        validateIndexForRemoveAndSet(index);
+        validateIndex(index);
         Node<T> node = getNode(index);
         T oldValue = node.value;
         node.value = value;
@@ -162,51 +139,35 @@ public class LinkedList<T> implements List<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException("This element does not exist");
             }
-            Object value = nextNode.value;
+            T value = nextNode.value;
             currentNode = nextNode;
             nextNode = nextNode.next;
-            return (T) value;
+            return value;
         }
 
         @Override
         public void remove() {
             if (currentNode == null) {
-                throw new IllegalStateException("The removing element is not identified");
+                throw new IllegalStateException("Next method has not yet been called, or the remove method has already been called after the last call to the next method");
             } else {
-                if (currentNode == head) {
-                    Node<T> newHead = currentNode.next;
-                    newHead.prev = null;
-                    head = newHead;
-                    currentNode = null;
-                } else if (currentNode == tail) {
-                    Node<T> newTail = currentNode.prev;
-                    newTail.next = null;
-                    tail = newTail;
-                    currentNode = null;
-                } else {
-                    Node<T> prev = currentNode.prev;
-                    Node<T> next = currentNode.next;
-                    prev.next = next;
-                    next.prev = prev;
-                    currentNode = null;
-                }
+               removeNode(currentNode);
             }
-            size--;
         }
     }
 
-    private void validateIndexForAddAndGet(int index) {
-        if (index < 0 || index > size) {
+    private void checkInBounds(int index, int endOfBound) {
+        if (index < 0 || index > endOfBound) {
             throw new IndexOutOfBoundsException("Element on the index " + index +
-                    " , is out of bounds: 0 - " + size);
+                    " , is out of bounds: 0 - " + endOfBound);
         }
     }
 
-    private void validateIndexForRemoveAndSet(int index) {
-        if (index < 0 || index > size - 1) {
-            throw new IndexOutOfBoundsException("Element on the index " + index +
-                    " , is out of bounds: 0 - " + (size - 1));
-        }
+    private void validateIndexForAdd(int index) {
+        checkInBounds(index, size);
+    }
+
+    private void validateIndex(int index) {
+        checkInBounds(index, size-1);
     }
 
     private Node<T> getNode(int index) {
@@ -225,13 +186,30 @@ public class LinkedList<T> implements List<T> {
         return current;
     }
 
+    private void removeNode(Node<T> currentNode) {
+        if (currentNode==head&&currentNode==tail){
+            currentNode.value = null;
+        } else if (currentNode == head) {
+            Node<T> newHead = currentNode.next;
+            newHead.prev = null;
+            head = newHead;
+        } else if (currentNode == tail) {
+            Node<T> newTail = currentNode.prev;
+            newTail.next = null;
+            tail = newTail;
+        } else {
+            Node<T> prev = currentNode.prev;
+            Node<T> next = currentNode.next;
+            prev.next = next;
+            next.prev = prev;
+        }
+        size--;
+    }
+
     private static class Node<T> {
         private T value;
         private Node<T> prev;
         private Node<T> next;
-
-        private Node() {
-        }
 
         private Node(T value) {
             this.value = value;

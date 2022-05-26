@@ -1,6 +1,6 @@
-package com.obolonyk.dataStructures.List.ArrayList;
+package com.obolonyk.datastructures.list.arraylist;
 
-import com.obolonyk.dataStructures.List.List;
+import com.obolonyk.datastructures.list.List;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -18,8 +18,9 @@ public class ArrayList<T> implements List<T> {
         this(DEFAULT_CAPACITY);
     }
 
-    public ArrayList(int length) {
-        this.array = (T[]) new Object[length];
+    @SuppressWarnings("unchecked")
+    public ArrayList(int capacity) {
+        this.array = (T[]) new Object[capacity];
     }
 
     @Override
@@ -29,28 +30,29 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public void add(T value, int index) {
-        checkInBounds(index, size);
-        if (size == array.length - 1) {
+        validateIndexForAdd(index);
+        if (size == array.length) {
             ensureCapacity();
         }
-        System.arraycopy(array, index, array, index + 1, size - index + 1);
+
+        System.arraycopy(array, index, array, index + 1, size - index);
         array[index] = value;
         size++;
     }
 
     @Override
     public T remove(int index) {
-        checkInBounds(index, size - 1);
-        Object removedValue = array[index];
+        validateIndex(index);
+        T removedValue = array[index];
         System.arraycopy(array, index + 1, array, index, array.length - index - 1);
         array[size - 1] = null;
         size--;
-        return (T) removedValue;
+        return removedValue;
     }
 
     @Override
     public T get(int index) {
-        checkInBounds(index, size);
+        validateIndex(index);
         return array[index];
     }
 
@@ -59,15 +61,17 @@ public class ArrayList<T> implements List<T> {
         if (isEmpty()) {
             throw new IndexOutOfBoundsException("Set element in empty list");
         }
-        checkInBounds(index, size - 1);
-        Object oldValue = array[index];
+        validateIndex(index);
+        T oldValue = array[index];
         array[index] = value;
-        return (T) oldValue;
+        return oldValue;
     }
 
     @Override
     public void clear() {
-        array = (T[]) new Object[DEFAULT_CAPACITY];
+        for (int i = 0; i < size; i++) {
+            array[i] = null;
+        }
         size = 0;
     }
 
@@ -88,24 +92,22 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public int indexOf(T value) {
-        int index = -1;
         for (int i = 0; i < size; i++) {
             if (Objects.equals(array[i], value)) {
                 return i;
             }
         }
-        return index;
+        return -1;
     }
 
     @Override
     public int lastIndexOf(T value) {
-        int index = -1;
-        for (int i = size - 1; i > 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             if (Objects.equals(array[i], value)) {
-                index = i;
+                return i;
             }
         }
-        return index;
+        return -1;
     }
 
     private void checkInBounds(int index, int endOfBound) {
@@ -115,8 +117,20 @@ public class ArrayList<T> implements List<T> {
         }
     }
 
+    private void validateIndexForAdd(int index) {
+        checkInBounds(index, size);
+    }
+
+    private void validateIndex(int index) {
+        checkInBounds(index, size-1);
+    }
+
+    @SuppressWarnings("unchecked")
     private void ensureCapacity() {
-        int newSize = (int) (size * LOAD_FACTOR);
+        int newSize = 2;
+        if (size!=1){
+            newSize = (int) (size * LOAD_FACTOR);
+        }
         T[] newArray = (T[]) new Object[newSize];
         System.arraycopy(array, 0, newArray, 0, size);
         array = newArray;
@@ -136,12 +150,11 @@ public class ArrayList<T> implements List<T> {
     }
 
     private class MyIterator implements Iterator<T> {
-        private int nextPosition = 0;
         private int currentPosition = -1;
 
         @Override
         public boolean hasNext() {
-            return nextPosition < size;
+            return currentPosition + 1  < size;
         }
 
         @Override
@@ -149,16 +162,16 @@ public class ArrayList<T> implements List<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException("This element does not exist");
             }
-            T result = array[nextPosition];
+            T result = array[currentPosition + 1];
             currentPosition++;
-            nextPosition++;
             return result;
         }
 
         @Override
         public void remove() {
             if (currentPosition == -1) {
-                throw new IllegalStateException("The removing element is not identified");
+                throw new IllegalStateException("Next method has not yet been called, " +
+                        "or the remove method has already been called after the last call to the next method");
             }
             ArrayList.this.remove(currentPosition);
             currentPosition = -1;
