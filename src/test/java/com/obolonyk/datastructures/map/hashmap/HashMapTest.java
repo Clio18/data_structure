@@ -1,6 +1,6 @@
-package com.obolonyk.dataStructures.Map.HashMap;
+package com.obolonyk.datastructures.map.hashmap;
 
-import com.obolonyk.dataStructures.Map.Map;
+import com.obolonyk.datastructures.map.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,11 +28,11 @@ class HashMapTest {
         map.put("AA", 4);
 
         mapEachBucketHasElements.put(5, 0);
-        mapEachBucketHasElements.put(10, 0);
-        mapEachBucketHasElements.put(15, 0);
+        mapEachBucketHasElements.put(10, 0); //
+        mapEachBucketHasElements.put(15, 0); //
 
-        mapEachBucketHasElements.put(6, 1);
-        mapEachBucketHasElements.put(11, 1);
+        mapEachBucketHasElements.put(6, 1); //
+        mapEachBucketHasElements.put(11, 1); //
         mapEachBucketHasElements.put(16, 1);
 
         mapEachBucketHasElements.put(7, 2);

@@ -1,8 +1,8 @@
-package com.obolonyk.dataStructures.Map.HashMap;
+package com.obolonyk.datastructures.map.hashmap;
 
-import com.obolonyk.dataStructures.List.ArrayList.ArrayList;
-import com.obolonyk.dataStructures.List.List;
-import com.obolonyk.dataStructures.Map.Map;
+import com.obolonyk.datastructures.list.arraylist.ArrayList;
+import com.obolonyk.datastructures.list.List;
+import com.obolonyk.datastructures.map.Map;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -25,23 +25,16 @@ public class HashMap<K, V> implements Map<K, V> {
     public V put(K key, V value) {
         restructure();
         List<Entry<K, V>> bucket = getBucket(key);
-        V returnedValue = null;
-        Entry<K, V> newEntry = new Entry<>(key, value);
-        if (bucket.size() == 0) {
-            bucket.add(newEntry);
-            size++;
-            return returnedValue;
-        }
         for (Entry<K, V> entry : bucket) {
             if (Objects.equals(entry.key, key)) {
-                returnedValue = entry.value;
+                V returnedValue = entry.value;
                 entry.value = value;
                 return returnedValue;
             }
         }
-        bucket.add(newEntry);
+        bucket.add(new Entry<>(key, value));
         size++;
-        return returnedValue;
+        return null;
     }
 
     @Override
@@ -140,42 +133,38 @@ public class HashMap<K, V> implements Map<K, V> {
 
         @Override
         public void remove() {
-            if (currentEntry != null) {
-                bucketIterator.remove();
-                currentEntry = null;
-                entryCounter = entryCounter - 1;
-                verifier = -1;
-                size--;
-            } else {
+            if (currentEntry == null) {
                 throw new IllegalStateException("The element does not exist");
             }
+            bucketIterator.remove();
+            currentEntry = null;
+            entryCounter = entryCounter - 1;
+            verifier = -1;
+            size--;
         }
     }
 
     private List<Entry<K, V>> getBucket(K key) {
-        int base = 0;
-        int index;
-        if (key != null) {
-            base = key.hashCode();
-            if (base == Integer.MIN_VALUE) {
-                index = Math.abs(base + 1) % buckets.length;
-                if (buckets[index] == null) {
-                    buckets[index] = new ArrayList<>();
-                }
-                return buckets[index];
-            } else {
-                index = Math.abs(base) % buckets.length;
-                if (buckets[index] == null) {
-                    buckets[index] = new ArrayList<>();
-                }
-                return buckets[index];
-            }
-        } else {
-            if (buckets[base] == null) {
-                buckets[base] = new ArrayList<>();
-            }
-            return buckets[base];
+        return getBucket(buckets, key);
+    }
+
+    private List<Entry<K, V>> getBucket(List<Entry<K, V>>[] buckets, K key) {
+        int index = getBucketIndex(buckets, key);
+        if (buckets[index] == null) {
+            buckets[index] = new ArrayList<>(1);
         }
+        return buckets[index];
+    }
+
+    private int getBucketIndex(List<Entry<K, V>>[] buckets, K key) {
+        if (key == null) {
+            return 0;
+        }
+        int hash = key.hashCode();
+        if (hash == Integer.MIN_VALUE) {
+            return 0;
+        }
+        return Math.abs(hash) % buckets.length;
     }
 
     private static class Entry<K, V> implements Map.Entry<K, V> {
@@ -223,7 +212,12 @@ public class HashMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsKey(K key) {
-        return get(key) != null;
+        for (Map.Entry<K, V> entry : this) {
+            if (Objects.equals(entry.getKey(), key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     int getBucketLength() {
@@ -234,18 +228,22 @@ public class HashMap<K, V> implements Map<K, V> {
         if (buckets.length * LOAD_FACTOR <= size) {
             int newCapacity = INITIAL_CAPACITY * DEFAULT_GROW;
             List<Entry<K, V>>[] newBuckets = new ArrayList[newCapacity];
-            List<Entry<K, V>>[] oldBuckets = new ArrayList[buckets.length];
-            System.arraycopy(buckets, 0, oldBuckets, 0, buckets.length);
-            buckets = newBuckets;
-            size = 0;
-            for (List<Entry<K, V>> oldBucket : oldBuckets) {
-                if (oldBucket != null) {
-                    for (Entry<K, V> entry : oldBucket) {
-                        put(entry.key, entry.value);
-                    }
-                }
+            for (Map.Entry<K, V> entry : this) {
+                innerPut(newBuckets, entry);
             }
+            buckets = newBuckets;
         }
+
+    }
+
+    private void innerPut(List<Entry<K, V>> [] newBuckets, Map.Entry<K, V> entry) {
+        K key = entry.getKey();
+        int index = getBucketIndex(newBuckets, key);
+        List<Entry<K, V>> list = new ArrayList<>(1);
+        if (newBuckets[index]==null) {
+            newBuckets[index] = list;
+        }
+        newBuckets[index].add((Entry<K, V>) entry);
     }
 
 }

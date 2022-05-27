@@ -1,4 +1,4 @@
-package com.obolonyk.dataStructures.Map;
+package com.obolonyk.datastructures.map;
 
 public interface Map<K, V> extends Iterable<Map.Entry<K,V>> {
     V put (K key, V value);
