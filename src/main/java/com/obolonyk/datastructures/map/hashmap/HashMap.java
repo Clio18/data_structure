@@ -17,6 +17,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private List<Entry<K, V>>[] buckets;
     private int size;
 
+    @SuppressWarnings("unchecked")
     public HashMap() {
         buckets = new ArrayList[INITIAL_CAPACITY];
     }
@@ -103,6 +104,7 @@ public class HashMap<K, V> implements Map<K, V> {
             return entryCounter != size;
         }
 
+
         @Override
         public Entry<K, V> next() {
             if (size != 0) {
@@ -117,8 +119,7 @@ public class HashMap<K, V> implements Map<K, V> {
                         }
                         if (bucketIterator.hasNext()) {
                             entryCounter++;
-                            currentEntry = bucketIterator.next();
-                            return currentEntry;
+                            return bucketIterator.next();
                         } else {
                             if (bucketIndex == buckets.length - 1) {
                                 break;
@@ -168,7 +169,7 @@ public class HashMap<K, V> implements Map<K, V> {
     }
 
     private static class Entry<K, V> implements Map.Entry<K, V> {
-        private K key;
+        private final K key;
         private V value;
 
         private Entry(K key, V value) {
@@ -224,6 +225,7 @@ public class HashMap<K, V> implements Map<K, V> {
         return buckets.length;
     }
 
+    @SuppressWarnings("unchecked")
     private void restructure() {
         if (buckets.length * LOAD_FACTOR <= size) {
             int newCapacity = INITIAL_CAPACITY * DEFAULT_GROW;
@@ -236,11 +238,11 @@ public class HashMap<K, V> implements Map<K, V> {
 
     }
 
-    private void innerPut(List<Entry<K, V>> [] newBuckets, Map.Entry<K, V> entry) {
+    private void innerPut(List<Entry<K, V>>[] newBuckets, Map.Entry<K, V> entry) {
         K key = entry.getKey();
         int index = getBucketIndex(newBuckets, key);
         List<Entry<K, V>> list = new ArrayList<>(1);
-        if (newBuckets[index]==null) {
+        if (newBuckets[index] == null) {
             newBuckets[index] = list;
         }
         newBuckets[index].add((Entry<K, V>) entry);
