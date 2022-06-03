@@ -1,6 +1,5 @@
 package com.obolonyk.datastructures.list;
 
-import com.obolonyk.datastructures.list.arraylist.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -563,27 +562,8 @@ public abstract class AbstractListTest {
     }
 
     @Test
-    @DisplayName("test EnsureCapacity For Capacity One")
-    void testEnsureCapacityForCapacityOne() {
-        List<String> list = new ArrayList<>(1);
-        list.add("A");
-        list.add("A");
-
-        assertEquals(2, list.size());
-
-    }
-
-    @Test
-    @DisplayName("test EnsureCapacity For Zero Capacity")
-    void testEnsureCapacityForZeroCapacity() {
-        List<String> list = new ArrayList<>(0);
-        assertThrows(ArrayIndexOutOfBoundsException.class, ()-> list.add("A"));
-
-    }
-
-    @Test
     @DisplayName("Test Remove By Removing By Zero Index")
-    void testRemoveByRemovingByZeroIndex(){
+    void testRemoveByRemovingByZeroIndex() {
         for (int i = 0; i < 5; i++) {
             emptyList.add("A");
         }

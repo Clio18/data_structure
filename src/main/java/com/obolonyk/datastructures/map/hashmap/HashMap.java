@@ -94,55 +94,57 @@ public class HashMap<K, V> implements Map<K, V> {
 
     private class HashMapIterator implements Iterator<Map.Entry<K, V>> {
         private int bucketIndex;
-        private int entryCounter;
-        private int verifier = -1;
+        private int entryCount;
         private Iterator<Entry<K, V>> bucketIterator;
-        private Entry<K, V> currentEntry;
+        private boolean canRemove = false;
+
 
         @Override
         public boolean hasNext() {
-            return entryCounter != size;
+            return entryCount != size;
         }
 
 
         @Override
         public Entry<K, V> next() {
-            if (size != 0) {
-                while (entryCounter <= size) {
-                    List<Entry<K, V>> currentBucket = buckets[bucketIndex];
-                    if (currentBucket == null) {
+            if (!hasNext()) {
+                throw new NoSuchElementException("There is no next element in the map");
+            }
+
+            while (true) {
+                List<Entry<K, V>> currentBucket = buckets[bucketIndex];
+                if (currentBucket == null) {
+                    bucketIndex++;
+                } else {
+                    if (bucketIterator == null) {
+                        bucketIterator = currentBucket.iterator();
+                    }
+
+                    if (!bucketIterator.hasNext()) {
                         bucketIndex++;
+                        bucketIterator = null;
                     } else {
-                        if (verifier != bucketIndex) {
-                            bucketIterator = currentBucket.iterator();
-                            verifier = bucketIndex;
-                        }
-                        if (bucketIterator.hasNext()) {
-                            entryCounter++;
-                            return bucketIterator.next();
-                        } else {
-                            if (bucketIndex == buckets.length - 1) {
-                                break;
-                            }
-                            bucketIndex++;
-                        }
+                        entryCount++;
+                        canRemove = true;
+                        return bucketIterator.next();
                     }
                 }
             }
-            throw new NoSuchElementException("There is no next element in the map");
+
         }
 
         @Override
         public void remove() {
-            if (currentEntry == null) {
+            if (!canRemove) {
                 throw new IllegalStateException("The element does not exist");
             }
+
             bucketIterator.remove();
-            currentEntry = null;
-            entryCounter = entryCounter - 1;
-            verifier = -1;
+            canRemove = false;
+            entryCount--;
             size--;
         }
+
     }
 
     private List<Entry<K, V>> getBucket(K key) {

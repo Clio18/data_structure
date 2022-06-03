@@ -122,15 +122,12 @@ public class ArrayList<T> implements List<T> {
     }
 
     private void validateIndex(int index) {
-        checkInBounds(index, size-1);
+        checkInBounds(index, size - 1);
     }
 
-    @SuppressWarnings("unchecked")
+    /** @noinspection unchecked*/
     private void ensureCapacity() {
-        int newSize = 2;
-        if (size!=1){
-            newSize = (int) (size * LOAD_FACTOR);
-        }
+        int newSize = (int) (size * LOAD_FACTOR) + 1;
         T[] newArray = (T[]) new Object[newSize];
         System.arraycopy(array, 0, newArray, 0, size);
         array = newArray;
@@ -154,7 +151,7 @@ public class ArrayList<T> implements List<T> {
 
         @Override
         public boolean hasNext() {
-            return currentPosition + 1  < size;
+            return currentPosition + 1 < size;
         }
 
         @Override
