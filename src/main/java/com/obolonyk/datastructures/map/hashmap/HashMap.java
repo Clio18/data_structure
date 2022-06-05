@@ -24,9 +24,8 @@ public class HashMap<K, V> implements Map<K, V> {
     public V put(K key, V value) {
         restructure();
         int index = getBucketIndex(buckets, key);
-        int hash = getHash(key);
         V returnedValue = null;
-        Entry<K, V> entry = new Entry<>(key, value, hash);
+        Entry<K, V> entry = new Entry<>(key, value);
         if (buckets[index] == null) {
             buckets[index] = entry;
             size++;
@@ -35,7 +34,7 @@ public class HashMap<K, V> implements Map<K, V> {
 
         Entry<K, V> oldEntry = getLastEntryInChain(buckets[index]);
 
-        if (Objects.equals(oldEntry.key, key) && oldEntry.hash == hash) {
+        if (Objects.equals(oldEntry.key, key)) {
             returnedValue = oldEntry.value;
             oldEntry.value = value;
         } else {
@@ -48,14 +47,13 @@ public class HashMap<K, V> implements Map<K, V> {
     @Override
     public V get(K key) {
         int index = getBucketIndex(buckets, key);
-        int keyHash = getHash(key);
         V returnedValue = null;
         if (buckets[index] == null) {
             return returnedValue;
         } else {
             Entry<K, V> entry = buckets[index];
             while (entry != null) {
-                if (Objects.equals(entry.key, key) && entry.hash == keyHash) {
+                if (Objects.equals(entry.key, key)) {
                     return entry.value;
                 }
                 entry = entry.next;
@@ -196,12 +194,10 @@ public class HashMap<K, V> implements Map<K, V> {
         private final K key;
         private V value;
         private Entry<K, V> next;
-        private final int hash;
 
-        public Entry(K key, V value, int hash) {
+        public Entry(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = hash;
         }
 
         @Override
@@ -282,14 +278,6 @@ public class HashMap<K, V> implements Map<K, V> {
             lastEntryInChain = lastEntryInChain.next;
         }
         return lastEntryInChain;
-    }
-
-    private int getHash(K key) {
-        int hash = 0;
-        if (key != null) {
-            hash = key.hashCode();
-        }
-        return hash;
     }
 
 }
