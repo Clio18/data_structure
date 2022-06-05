@@ -24,13 +24,9 @@ public class HashMap<K, V> implements Map<K, V> {
     public V put(K key, V value) {
         restructure();
         int index = getBucketIndex(buckets, key);
-
         int hash = getHash(key);
-
         V returnedValue = null;
-
         Entry<K, V> entry = new Entry<>(key, value, null, hash);
-
         if (buckets[index] == null) {
             buckets[index] = entry;
             size++;
@@ -86,12 +82,26 @@ public class HashMap<K, V> implements Map<K, V> {
     @Override
     public V remove(K key) {
         V returnedValue = null;
-        Iterator<Map.Entry<K, V>> iterator = this.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<K, V> next = iterator.next();
-            if (Objects.equals(next.getKey(), key)) {
-                iterator.remove();
-                return next.getValue();
+        int bucketIndex = getBucketIndex(buckets, key);
+        Entry<K, V> bucket = buckets[bucketIndex];
+        if (bucket == null) {
+            return returnedValue;
+        } else {
+            while (bucket.next != null) {
+                Entry<K, V> next = bucket.next;
+                if (Objects.equals(bucket.key, key)) {
+                    returnedValue = bucket.value;
+                    buckets[bucketIndex] = next;
+                    size--;
+                    return returnedValue;
+                }
+                bucket = next;
+            }
+            if (Objects.equals(bucket.key, key)) {
+                returnedValue = bucket.value;
+                buckets[bucketIndex] = null;
+                size--;
+                return returnedValue;
             }
         }
         return returnedValue;
