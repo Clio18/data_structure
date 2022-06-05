@@ -26,7 +26,7 @@ public class HashMap<K, V> implements Map<K, V> {
         int index = getBucketIndex(buckets, key);
         int hash = getHash(key);
         V returnedValue = null;
-        Entry<K, V> entry = new Entry<>(key, value, null, hash);
+        Entry<K, V> entry = new Entry<>(key, value, hash);
         if (buckets[index] == null) {
             buckets[index] = entry;
             size++;
@@ -198,10 +198,9 @@ public class HashMap<K, V> implements Map<K, V> {
         private Entry<K, V> next;
         private final int hash;
 
-        public Entry(K key, V value, Entry<K, V> next, int hash) {
+        public Entry(K key, V value, int hash) {
             this.key = key;
             this.value = value;
-            this.next = next;
             this.hash = hash;
         }
 
