@@ -34,13 +34,16 @@ public class HashMap<K, V> implements Map<K, V> {
 
         Entry<K, V> oldEntry = getLastEntryInChain(buckets[index]);
 
-        if (Objects.equals(oldEntry.key, key)) {
-            returnedValue = oldEntry.value;
-            oldEntry.value = value;
-        } else {
-            oldEntry.next = entry;
-            size++;
+        if (entry.hash == oldEntry.hash) {
+            if (Objects.equals(oldEntry.key, key)) {
+                returnedValue = oldEntry.value;
+                oldEntry.value = value;
+                return returnedValue;
+            }
         }
+
+        oldEntry.next = entry;
+        size++;
         return returnedValue;
     }
 
@@ -85,8 +88,8 @@ public class HashMap<K, V> implements Map<K, V> {
         if (bucket == null) {
             return returnedValue;
         } else {
+            Entry<K, V> next = bucket.next;
             while (bucket.next != null) {
-                Entry<K, V> next = bucket.next;
                 if (Objects.equals(bucket.key, key)) {
                     returnedValue = bucket.value;
                     buckets[bucketIndex] = next;
@@ -97,7 +100,7 @@ public class HashMap<K, V> implements Map<K, V> {
             }
             if (Objects.equals(bucket.key, key)) {
                 returnedValue = bucket.value;
-                buckets[bucketIndex] = null;
+                buckets[bucketIndex] = next;
                 size--;
                 return returnedValue;
             }
@@ -195,9 +198,15 @@ public class HashMap<K, V> implements Map<K, V> {
         private V value;
         private Entry<K, V> next;
 
+        private int hash;
+
         public Entry(K key, V value) {
             this.key = key;
             this.value = value;
+            if (key != null) {
+                this.hash = key.hashCode();
+            }
+            hash = 1;
         }
 
         @Override
