@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,29 +115,29 @@ class HashMapTest {
     @Test
     @DisplayName("Test Put And Check Old Value")
     void testPutAndCheckOldValue() {
-        Object oldValue = map.put("A", 8);
-        assertEquals(1, (Integer) oldValue);
+        Integer oldValue = map.put("A", 8);
+        assertEquals(1, oldValue);
     }
 
     @Test
     @DisplayName("Test Put New And Check Null")
     void testPutNewAndCheckNull() {
         Object oldValue = map.put("N", 8);
-        assertEquals(null, oldValue);
+        assertNull(oldValue);
     }
 
     @Test
     @DisplayName("Test Get And Check Result")
     void testGetAndCheckResult() {
-        Object resultValue = map.get("A");
-        assertEquals(1, (Integer) resultValue);
+        Integer resultValue = map.get("A");
+        assertEquals(1, resultValue);
     }
 
     @Test
     @DisplayName("Test Get Not Existed Value And Check Null")
     void testGetNotExistedValueAndCheckNull() {
         Object resultValue = map.get("D");
-        assertEquals(null, resultValue);
+        assertNull(resultValue);
     }
 
     @Test
@@ -162,8 +163,8 @@ class HashMapTest {
     @Test
     @DisplayName("Test Remove And Check Removed Value")
     void testRemoveAndCheckRemovedValue() {
-        Object removedValue = map.remove("A");
-        assertEquals(1, (Integer) removedValue);
+        Integer removedValue = map.remove("A");
+        assertEquals(1, removedValue);
     }
 
     @Test
@@ -175,7 +176,7 @@ class HashMapTest {
     @Test
     @DisplayName("Test Iterator And Check Size")
     void testIteratorAndCheckSize() {
-        Iterator iterator = map.iterator();
+        Iterator<Map.Entry<String, Integer>> iterator = map.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
@@ -187,7 +188,7 @@ class HashMapTest {
     @Test
     @DisplayName("Test Iterator On Map Each Bucket Has Elements And Check Size")
     void testIteratorOnMapEachBucketHasElementsAndCheckSize() {
-        Iterator iterator = mapEachBucketHasElements.iterator();
+        Iterator<Map.Entry<Integer, Integer>> iterator = mapEachBucketHasElements.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
@@ -199,7 +200,7 @@ class HashMapTest {
     @Test
     @DisplayName("Test Iterator On Map First Bucket Empty And Check Size")
     void testIteratorOnMapFirstBucketEmptyAndCheckSize() {
-        Iterator iterator = mapFirstBucketEmpty.iterator();
+        Iterator<Map.Entry<Integer, Integer>> iterator = mapFirstBucketEmpty.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
@@ -211,19 +212,20 @@ class HashMapTest {
     @Test
     @DisplayName("Test Iterator On Map Only First Bucket Has Elements And Check Size")
     void testIteratorOnMapOnlyFirstBucketHasElementsAndCheckSize() {
-        Iterator iterator = mapOnlyFirstBucketHasElements.iterator();
+        Iterator<Map.Entry<Integer, Integer>> iterator = mapOnlyFirstBucketHasElements.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
             iterator.next();
         }
+
         assertEquals(mapOnlyFirstBucketHasElements.size(), counter);
     }
 
     @Test
     @DisplayName("Test Iterator On Map Only Last Bucket Has Elements And Check Size")
     void testIteratorOnMapOnlyLastBucketHasElementsAndCheckSize() {
-        Iterator iterator = mapOnlyLastBucketHasElements.iterator();
+        Iterator<Map.Entry<Integer, Integer>> iterator = mapOnlyLastBucketHasElements.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
@@ -235,7 +237,7 @@ class HashMapTest {
     @Test
     @DisplayName("Test Iterator On Map Middle Bucket Has Elements And Check Size")
     void testIteratorOnMapMiddleBucketHasElementsAndCheckSize() {
-        Iterator iterator = mapMiddleBucketHasElements.iterator();
+        Iterator<Map.Entry<Integer, Integer>> iterator = mapMiddleBucketHasElements.iterator();
         int counter = 0;
         while (iterator.hasNext()) {
             counter++;
@@ -247,7 +249,7 @@ class HashMapTest {
     @Test
     @DisplayName("Test Iterator Remove And Check IsEmpty")
     void testIteratorRemoveAndCheckIsEmpty() {
-        Iterator iterator = map.iterator();
+        Iterator<Map.Entry<String, Integer>> iterator = map.iterator();
         assertThrows(IllegalStateException.class, () -> {
             while (iterator.hasNext()) {
                 iterator.remove();
@@ -400,7 +402,6 @@ class HashMapTest {
         map.put(thirdKey, thirdValue);
 
         assertEquals(3, map.size());
-        ;
 
         assertEquals(firstValue, map.get(firstKey));
         assertEquals(secondValue, map.get(secondKey));
@@ -412,7 +413,7 @@ class HashMapTest {
     void givenNotExistingKeyWhenGetByKeyThenNullShouldBeReturned() {
         Map<String, String> map = new HashMap<>();
         map.put("existing key", "value");
-        assertEquals(null, map.get("not existing key"));
+        assertNull(map.get("not existing key"));
     }
 
     @Test
@@ -619,9 +620,7 @@ class HashMapTest {
     @Test
     @DisplayName("Given Empty Map When Iterator Next Then No Such Element Exception Should Be Raised")
     void givenEmptyMapWhenIteratorNextThenNoSuchElementExceptionShouldBeRaised() {
-        assertThrows(NoSuchElementException.class, () -> {
-            new HashMap<>().iterator().next();
-        });
+        assertThrows(NoSuchElementException.class, () -> new HashMap<>().iterator().next());
 
     }
 
@@ -639,9 +638,7 @@ class HashMapTest {
         assertEquals(key, entry.getKey());
         assertEquals(value, entry.getValue());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            iterator.next();
-        });
+        assertThrows(NoSuchElementException.class, iterator::next);
     }
 
     @Test
@@ -691,9 +688,8 @@ class HashMapTest {
     @Test
     @DisplayName("Given Empty Map When Iterator Remove Then No Such Element Exception Should Be Raised")
     void givenEmptyMapWhenIteratorRemoveThenNoSuchElementExceptionShouldBeRaised() {
-        assertThrows(IllegalStateException.class, () -> {
-            new HashMap<>().iterator().remove();
-        });
+        Iterator<Map.Entry<Object, Object>> iterator = new HashMap<>().iterator();
+        assertThrows(IllegalStateException.class, iterator::remove);
     }
 
     @Test
@@ -702,9 +698,8 @@ class HashMapTest {
         HashMap<String, String> map = new HashMap<>();
         map.put("key", "value");
         assertEquals(1, map.size());
-        assertThrows(IllegalStateException.class, () -> {
-            map.iterator().remove();
-        });
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+        assertThrows(IllegalStateException.class, iterator::remove);
     }
 
     @Test
@@ -842,6 +837,5 @@ class HashMapTest {
         assertEquals(0, map.size());
         assertFalse(map.containsKey(key));
     }
-
 
 }
